@@ -1,18 +1,23 @@
 import logo from '../logo.svg';
 import React, { useEffect, useState } from 'react';
+import { usePhysics } from '../hooks/usePhysics';
+import { GRAVITY, JUMP_VELOCITY, makeVector } from '../util/util';
+
+const playerStates = {
+    RUNNING: Symbol("running"),
+    JUMPING: Symbol("jumping")
+};
 
 function Player() {
-    const [x, setX] = useState(0);
-    const [y, setY] = useState(0);
-    const [dx, setDx] = useState(0);
-    const [dy, setDy] = useState(0);
-    const [ax, setAx] = useState(0);
-    const [ay, setAy] = useState(0);
+    const [state, setState] = useState(playerStates.RUNNING);
+    const position = makeVector(useState(100), useState(100));
+    const velocity = makeVector(useState(0), useState(0));
+    const acceleration = makeVector(useState(0), useState(GRAVITY));
     
-
     useEffect(() => {
         const jump = (event) => {
-            setAy(20);
+            velocity.setY(JUMP_VELOCITY);
+            setState(playerStates.JUMPING);
         };
         window.addEventListener('keydown', jump);
         return () => {
@@ -20,17 +25,15 @@ function Player() {
         };
     }, []);
 
-    const update = () => {
-
-    }
+    usePhysics(position, velocity, acceleration);
 
     return (
         <>
             <img src={logo} className="App-logo" alt="logo" 
                 style={{
                     position: 'absolute',
-                    top: 100 - y + 'px',
-                    left: 100 - x + 'px'
+                    top: position.y + 'px',
+                    left: position.x + 'px'
                 }}/>
         </>
     );
